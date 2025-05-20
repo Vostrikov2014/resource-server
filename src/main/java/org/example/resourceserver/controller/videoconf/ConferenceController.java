@@ -6,12 +6,14 @@ import org.example.resourceserver.entity.ConferenceEntity;
 import org.example.resourceserver.service.videoconf.ConferenceService;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
+//@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ConferenceController {
 
@@ -27,18 +30,26 @@ public class ConferenceController {
     private final HttpSession session;
 
     @GetMapping("/conferences")
-    public ResponseEntity<List<ConferenceEntity>> getConferences(@AuthenticationPrincipal UserDetails userDetails) {
+    //@PreAuthorize("hasAuthority('SCOPE_read')") // Ограничиваем доступ для scope 'read'
+    public ResponseEntity<List<ConferenceEntity>> getConferences() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(", "));
+        //String username = jwt.getClaimAsString("username");
+        //String authorities = jwt.getClaimAsString("authorities");
+
+        // получаем данные пользователя
+        //UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        //String username = authentication.getName();
+        String username = "anonymousUser";
+        //String authorities = authentication.getAuthorities().stream()
+        //        .map(GrantedAuthority::getAuthority)
+        //        .collect(Collectors.joining(", "));
 
         if (username.equals("anonymousUser")) {
             return ResponseEntity.ok(conferenceService.findAll());
-        } else if (userDetails != null) {
-            return ResponseEntity.ok(conferenceService.findAllByHostUsername(userDetails.getUsername()));
+        //} else if (userDetails != null) {
+        //    return ResponseEntity.ok(conferenceService.findAllByHostUsername(userDetails.getUsername()));
         } else {
             return ResponseEntity.ok(conferenceService.findAllByHostUsername("xxx"));
         }
