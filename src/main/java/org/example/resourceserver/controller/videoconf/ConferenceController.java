@@ -31,7 +31,13 @@ public class ConferenceController {
 
     @GetMapping("/conferences")
     //@PreAuthorize("hasAuthority('SCOPE_read')") // Ограничиваем доступ для scope 'read'
-    public ResponseEntity<List<ConferenceEntity>> getConferences() {
+    public ResponseEntity<List<ConferenceEntity>> getConferences(Authentication authentication) {
+
+        if (authentication != null) {
+            return ResponseEntity.ok(conferenceService.findAllByHostUsername(authentication.getName()));
+        } else {
+            return ResponseEntity.ok(conferenceService.findAll());
+        }
 
         //String username = jwt.getClaimAsString("username");
         //String authorities = jwt.getClaimAsString("authorities");
@@ -39,20 +45,6 @@ public class ConferenceController {
         // получаем данные пользователя
         //UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //String username = authentication.getName();
-        String username = "anonymousUser";
-        //String authorities = authentication.getAuthorities().stream()
-        //        .map(GrantedAuthority::getAuthority)
-        //        .collect(Collectors.joining(", "));
-
-        if (username.equals("anonymousUser")) {
-            return ResponseEntity.ok(conferenceService.findAll());
-        //} else if (userDetails != null) {
-        //    return ResponseEntity.ok(conferenceService.findAllByHostUsername(userDetails.getUsername()));
-        } else {
-            return ResponseEntity.ok(conferenceService.findAllByHostUsername("xxx"));
-        }
     }
 
     @GetMapping("/conference/{id}")
@@ -63,10 +55,8 @@ public class ConferenceController {
     }
 
     @PostMapping("/conferences")
-    public ResponseEntity<ConferenceEntity> createConference(@RequestBody ConferenceEntity conference,
-                                                             @CurrentSecurityContext(expression = "authentication") Authentication authentication,
-                                                             @AuthenticationPrincipal UserDetails userDetails) {
-        String hostUsername = "null";
+    public ResponseEntity<ConferenceEntity> createConference(Authentication authentication, @RequestBody ConferenceEntity conference) {
+        String hostUsername = null;
         if (authentication != null && authentication.isAuthenticated()) {
             hostUsername =  authentication.getName();
         }
