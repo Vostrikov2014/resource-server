@@ -21,8 +21,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Отключаем CSRF для прототипов REST API
                 .cors(config -> config.configurationSource(corsConfigurationSource())) // Включаем CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/conferences").authenticated()
-                        .anyRequest().permitAll()
+                        //.requestMatchers("/conferences").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2
                         .jwt(Customizer.withDefaults())

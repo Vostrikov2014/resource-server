@@ -6,15 +6,12 @@ import org.example.resourceserver.entity.ConferenceEntity;
 import org.example.resourceserver.service.videoconf.ConferenceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-//@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ConferenceController {
 
@@ -59,8 +56,7 @@ public class ConferenceController {
     }
 
     @PutMapping("/conferences")
-    public ResponseEntity<ConferenceEntity> updateConference(@RequestBody ConferenceEntity conference,
-                                                       @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ConferenceEntity> updateConference(@RequestBody ConferenceEntity conference) {
         ConferenceEntity savedConference = conferenceService.updateConference(conference);
         return ResponseEntity.ok(savedConference);
     }
